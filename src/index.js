@@ -1,70 +1,29 @@
-// 1个reducer
-/*
-import { createStore, combineReducers, applyMiddleware } from 'redux'
-
-var simpleReducer = function(state = {}, action) {
-  return {
-    user: {
-      name: 'redux'
-    }
-  }
-}
-var store = createStore(simpleReducer)
-console.log(store.getState())
-*/
-
-// 创建多个reducer
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
+import React from 'react'
+import ReactDom from 'react-dom'
+import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
-function user(state = { name: 'redux' }, action) {
-    switch (action.type) {
-        case 'CHANGE_USER_NAME':
-            return {
-                ...state,
-                name: action.name
-            }
-        default: return state
-    }
-}
-function project(state = { name: 'min-react' }, action) {
-    switch (action.type) {
-        case 'CHANGE_PROJECT_NAME':
-            return {
-                ...state,
-                name: action.name
-            }
-        default: return state
-    }
-}
-var rootReducer = combineReducers({
-    user,
-    project
-})
-//store部分做如下修改
-const finalCreateStore = compose(applyMiddleware(thunk))(createStore)
-const store = finalCreateStore(rootReducer, {})
-// var store = createStore(rootReducer)
-function render(state = store.getState()) {
-    var UserName = document.getElementById('userName')
-    UserName.innerHTML = state.user.name
-}
-store.subscribe(function () {
-    render()
-})
+import { Provider } from 'react-redux'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
-// 绑定用户事件
-var UserNameInput = document.getElementById('userNameInput')
-var UserNameButton = document.getElementById('userNameButton')
-UserNameButton.onclick = function () {
-    var value = UserNameInput.value;
-    store.dispatch(function (dispatch, getState) {
-        setTimeout(() => {
-            dispatch({
-                type: "CHANGE_USER_NAME",
-                name: value
-            })
-        }, 1000)
-    })
+import Login from './container/login/login'
+import Register from './container/register/register'
+import reducers from "./reducer";
 
-}
-console.log(store.getState())
+const store = createStore(reducers, compose(
+    applyMiddleware(thunk),
+    window.devToolsExtension ? window.devToolsExtension : f => f
+))
+
+ReactDom.render(
+    (<Provider store={store}>
+        <BrowserRouter>
+            <div>
+                <Switch>
+                    <Route path="/login" component={Login}></Route>
+                    <Route path="/register" component={Register}></Route>
+                </Switch>
+            </div>
+        </BrowserRouter>
+    </Provider>),
+    document.getElementById('root')
+)

@@ -1,0 +1,8 @@
+npm install axios --save
+npm install --save react-redux
+npm install --save react-router-dom
+
+npm install antd-mobile --save
+npm i --save babel-plugin-import // 按需加载
+
+npm i react-app-rewired --save-dev
