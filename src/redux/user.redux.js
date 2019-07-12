@@ -1,4 +1,5 @@
-// import axios from 'axios'
+import axios from 'axios'
+import { bindActionCreators } from 'redux';
 const initState = {
     isLogin: false,
     tokenInfo: null,
@@ -15,11 +16,43 @@ const initState = {
     isAdminCheck: false // 竞赛部
 }
 const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
+const ERROR_MSG = 'ERROR_MSG'
+function loginSuccess(obj) {
+    const { pwd, ...data } = obj
+    return { type: LOGIN_SUCCESS, payload: data }
+}
+function errorMsg(msg) {
+    console.log(msg)
+    return { msg, type: ERROR_MSG }
+}
 export function userInfo(state = initState, action) {
     switch (action.type) {
         case LOGIN_SUCCESS:
-            return { ...state, ...action.payload }
+            return { ...state, isLogin: true, ...action.payload }
+        case ERROR_MSG:
+            return { ...state, isLogin: false, msg: action.msg }
         default:
             return state
     }
 }
+export function login({ userName, userKey, verifyCode }) {
+    if (!userName || !userKey) {
+        return errorMsg('用户密码必须输入!')
+    }
+    return dispatch => {
+        global.$api.login({ userName, userKey, verifyCode }).then(res => {
+            if (res.status === 'SUCCESS') {
+                dispatch(loginSuccess(res.data))
+            } else {
+                dispatch(errorMsg(res.msg))
+            }
+        }, error => {
+            dispatch(errorMsg(error))
+        })
+    }
+}
+
+
+export const mapDispatchToProps = dispatch => ({
+    actions: bindActionCreators({ loginSuccess, errorMsg }, dispatch)
+})
